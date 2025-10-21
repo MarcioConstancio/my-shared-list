@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- ===== PASSO 1: A META TAG VIEWPORT ESSENCIAL ===== -->
+    <!-- Esta linha diz ao navegador para usar a largura do dispositivo como a largura da 'janela' de visualização. É o ponto de partida de todo design responsivo. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Minha Lista de Compras</title>
+    <style>
+        /* Reset e Fontes (sem alterações) */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* Navegação (sem alterações na base) */
+        nav {
+            background-color: #fff;
+            padding: 15px 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2em;
+            flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha se não houver espaço */
+        }
+        nav a, nav .link-button {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+            margin-left: 15px;
+        }
+        nav .link-button {
+            background: none; border: none; cursor: pointer; font-size: inherit; font-family: inherit;
+        }
+        nav a:hover, nav .link-button:hover {
+            text-decoration: underline;
+        }
+        
+        /* Container Principal - JÁ É RESPONSIVO! */
+        /* Usar 'max-width' é uma ótima técnica responsiva. Ele permite que o container encolha em telas menores, mas não passe de 800px em telas grandes. */
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Estilo de Card (sem alterações) */
+        .card {
+            background-color: #fff;
+            padding: 2em;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Formulários (sem alterações) */
+        form { margin-bottom: 1em; }
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 1em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        button:hover { background-color: #0056b3; }
+
+        /* Lista de Itens (sem alterações) */
+        ul { list-style-type: none; padding: 0; }
+        .item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .item:last-child { border-bottom: none; }
+        .item.checked span { text-decoration: line-through; color: #888; }
+        .item input[type="checkbox"] { margin-right: 15px; width: 20px; height: 20px; }
+        
+        h2, h4 { color: #333; }
+        hr { border: 1px solid #eee; margin: 2em 0; }
+
+
+        /* ===== PASSO 2: A MEDIA QUERY PARA TELAS PEQUENAS ===== */
+        /* As regras dentro deste bloco só serão aplicadas quando a largura da tela for 600px ou menor. */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px; /* Reduz o espaçamento nas laterais da página */
+            }
+
+            nav {
+                flex-direction: column; /* Empilha o logo e os links verticalmente */
+                align-items: flex-start; /* Alinha tudo à esquerda */
+                gap: 15px; /* Adiciona um espaço entre os itens empilhados */
+            }
+
+            nav div {
+                /* O container dos links de usuário */
+                display: flex;
+                flex-direction: column; /* Empilha "Olá, User" e "Sair" */
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            nav a, nav .link-button {
+                margin-left: 0; /* Remove a margem que só fazia sentido no layout horizontal */
+            }
+
+            .card {
+                padding: 1.5em; /* Reduz o padding interno do card para dar mais espaço ao conteúdo */
+            }
+
+            button {
+                padding: 14px 20px; /* Aumenta um pouco o padding do botão para ser mais fácil de tocar */
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- O HTML do body permanece exatamente o mesmo -->
+    <nav>
+        <a href="{% url 'dashboard' %}" style="margin-left: 0;"><strong>Lista de Compras</strong></a>
+        <div>
+            {% if user.is_authenticated %}
+                <span>Olá, {{ user.first_name|default:user.email }}!</span>
+                <a href="{% url 'dashboard' %}">Minhas Listas</a>
+                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="link-button">Sair</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}">Entrar</a>
+                <a href="{% url 'register' %}">Registrar</a>
+            {% endif %}
+        </div>
+    </nav>
+    
+    <main>
+        <div class="card">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    {% block javascript %}{% endblock %}
+</body>
+</html>

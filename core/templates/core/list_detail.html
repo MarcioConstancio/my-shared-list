@@ -1,0 +1,142 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+    <h2>{{ list_obj.title }}</h2>
+
+    <hr>
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="item_name" placeholder="Nome do item" required>
+        <input type="text" name="item_quantity" value="1" size="3">
+        <button type="submit">Adicionar Item</button>
+    </form>
+
+    <hr>
+
+    <ul id="item-list">
+        {% for item in items %}
+            <li id="item-{{ item.id }}" class="item {% if item.is_checked %}checked{% endif %}">
+                <input 
+                    type="checkbox" 
+                    data-item-id="{{ item.id }}" 
+                    class="item-checkbox"
+                    {% if item.is_checked %}checked{% endif %}
+                >
+                <span>{{ item.quantity }} - {{ item.name }}</span>
+            </li>
+        {% empty %}
+            <li>Nenhum item nesta lista ainda.</li>
+        {% endfor %}
+    </ul>
+
+    <hr>
+
+    {% if list_obj.owner == user %}
+    <div class="sharing-section">
+        <h4>Compartilhar esta lista</h4>
+        <form action="{% url 'share_list' list_obj.id %}" method="post">
+            {% csrf_token %}
+            <input type="email" name="email" placeholder="Digite o email" required>
+            <button type="submit">Compartilhar por e-mail</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="shared-with">
+        <p>Compartilhada com: 
+        {% for shared_user in list_obj.shared_with.all %}
+            {{ shared_user.email}}{% if not forloop.last %}, {% endif %}
+        {% empty %}
+            Ninguém.
+        {% endfor %}
+        </p>
+    </div>
+
+    <div style="margin-top: 1.5em; margin-bottom: 1.5em;">
+        <a 
+            href="https://wa.me/?text={{ list_obj.get_formatted_text_for_sharing|urlencode }}" 
+            target="_blank" 
+            style="display: block; text-align: center; background-color: #25D366; color: white; padding: 12px; border-radius: 4px; text-decoration: none; font-weight: bold;"
+        >
+            🔗 Enviar Lista via WhatsApp
+        </a>
+    </div>
+
+    
+{% endblock %}
+
+{% block javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const listId = {{ list_obj.id }};
+    const itemList = document.getElementById('item-list');
+    const csrfToken = document.querySelector('form[method="post"] [name=csrfmiddlewaretoken]').value;
+
+    // --- Conexão WebSocket ---
+    const chatSocket = new WebSocket(
+        'ws://' + window.location.host + '/ws/list/' + listId + '/'
+    );
+
+    // Ouve mensagens do servidor
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const eventType = data.event_type;
+        const itemData = data.item;
+
+        if (eventType === 'item_added') {
+            // Cria o novo elemento <li> e adiciona na lista
+            const newItemLi = document.createElement('li');
+            newItemLi.id = `item-${itemData.id}`;
+            newItemLi.className = 'item';
+            newItemLi.innerHTML = `
+                <input 
+                    type="checkbox" 
+                    data-item-id="${itemData.id}" 
+                    class="item-checkbox"
+                >
+                <span>${itemData.quantity} - ${itemData.name}</span>
+            `;
+            itemList.appendChild(newItemLi);
+            // Adiciona o listener de clique ao novo checkbox
+            attachListenerToCheckbox(newItemLi.querySelector('.item-checkbox'));
+
+        } else if (eventType === 'item_toggled') {
+            // Encontra o item existente e atualiza seu estado
+            const listItem = document.getElementById(`item-${itemData.id}`);
+            const checkbox = listItem.querySelector('.item-checkbox');
+            
+            listItem.classList.toggle('checked', itemData.is_checked);
+            checkbox.checked = itemData.is_checked;
+        }
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Socket fechado inesperadamente');
+    };
+
+    // --- Lógica de clique (agora em uma função para ser reutilizada) ---
+    function attachListenerToCheckbox(checkbox) {
+        checkbox.addEventListener('click', (event) => {
+            const itemId = event.target.dataset.itemId;
+            const url = `/api/item/${itemId}/toggle/`;
+            
+            // O fetch ainda é necessário para INICIAR a mudança no backend
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json'
+                },
+            }).catch(error => console.error('Erro ao marcar item:', error));
+            // A atualização visual agora será recebida via WebSocket
+        });
+    }
+
+    // Adiciona o listener a todos os checkboxes que já existem na página
+    document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+        attachListenerToCheckbox(checkbox);
+    });
+});
+</script>
+{% endblock %}

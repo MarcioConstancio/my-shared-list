@@ -1,0 +1,25 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+    <h2>Minhas Listas</h2>
+    
+    <!-- Formulário para criar nova lista -->
+    <form action="{% url 'create_list' %}" method="post">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="Nome da nova lista" required>
+        <button type="submit">Criar Nova Lista</button>
+    </form>
+
+    <hr>
+
+    <ul>
+        {% for list in lists %}
+            <li>
+                <a href="{% url 'list_detail' list.id %}">{{ list.title }}</a> 
+                (Dono: {{ list.owner.username }})
+            </li>
+        {% empty %}
+            <li>Você ainda não tem nenhuma lista. Crie uma acima!</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

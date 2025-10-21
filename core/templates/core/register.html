@@ -1,0 +1,10 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+    <h2>Registrar</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }} <!-- as_p ainda é aceitável aqui, mas para um controle fino, faríamos como no login -->
+        <button type="submit">Registrar</button>
+    </form>
+{% endblock %}

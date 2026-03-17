@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar Código - My Shared List</title>
+</head>
+<body>
+    <div style="max-width: 400px; margin: 50px auto; font-family: sans-serif; text-align: center;">
+        <h2>Verificação de Segurança</h2>
+        <p>Enviamos um código de 6 dígitos para o e-mail:<br><strong>{{ email }}</strong></p>
+        
+        {% if messages %}
+            <ul style="color: red; list-style-type: none; padding: 0;">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        
+        <form method="post" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" style="padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
+                Validar e Entrar
+            </button>
+        </form>
+        <p style="margin-top: 20px;">
+            <a href="{% url 'login' %}">Voltar e usar outro e-mail</a>
+        </p>
+    </div>
+</body>
+</html>

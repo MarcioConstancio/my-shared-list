@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar - My Shared List</title>
+</head>
+<body>
+    <div style="max-width: 400px; margin: 50px auto; font-family: sans-serif; text-align: center;">
+        <h2>Bem-vindo(a) à My Shared List</h2>
+        <p>Insira seu e-mail para entrar. Se você não tem conta, criaremos uma na hora!</p>
+        
+        <form method="post" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" style="padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
+                Enviar Código de Acesso
+            </button>
+        </form>
+    </div>
+</body>
+</html>

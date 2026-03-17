@@ -1,12 +1,12 @@
 from django.urls import path
 from . import views
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
     # Autenticação
-    path('register/', views.register_view, name='register'),
-    # Usando a LoginView pronta do Django, mas apontando para nosso template
-    path('login/', LoginView.as_view(template_name='core/login.html'), name='login'),
+    # Novo fluxo de Login/Cadastro Passwordless
+    path('login/', views.request_login_view, name='login'),
+    path('login/verify/', views.verify_login_view, name='verify_login'),
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
 
     # Aplicação

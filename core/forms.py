@@ -12,3 +12,16 @@ class CustomUserCreationForm(UserCreationForm):
         model = User
         # O campo 'email' já é o principal. O campo 'username' não é mais necessário aqui.
         fields = ('email', 'telefone')
+
+class RequestOTPForm(forms.Form):
+    email = forms.EmailField(
+        label='Seu Email', 
+        widget=forms.EmailInput(attrs={'placeholder': 'digite@seuemail.com'})
+    )
+
+class VerifyOTPForm(forms.Form):
+    otp = forms.CharField(
+        label='Código de Verificação', 
+        max_length=6, 
+        widget=forms.TextInput(attrs={'placeholder': '000000', 'autocomplete': 'one-time-code'})
+    )

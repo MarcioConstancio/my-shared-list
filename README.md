@@ -6,12 +6,51 @@ Este é um projeto Django para uma lista de compras compartilhada, utilizando We
 
 Antes de começar, certifique-se de ter instalado:
 
+- [Docker](https://docs.docker.com/get-docker/) e [Docker Compose](https://docs.docker.com/compose/install/) (Recomendado)
+- Git
+
+---
+
+## 🚀 Início Rápido (Com Docker - Recomendado)
+
+A maneira mais fácil e rápida de rodar o projeto é utilizando o Docker. Ele configura automaticamente o banco de dados MySQL, o Redis e a aplicação Web.
+
+1. Clone o repositório e entre na pasta:
+   ```bash
+   git clone https://github.com/seu-usuario/my-shared-list.git
+   cd my-shared-list
+   ```
+
+2. Crie um arquivo `.env` na raiz do projeto (o Docker usará essas credenciais para configurar o MySQL):
+   ```env
+   SECRET_KEY=sua-chave-secreta-muito-segura
+   DEBUG=True
+   ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+   DB_NAME=my_shared_list
+   DB_USER=my_shared_list
+   DB_PASSWORD=secret
+   ```
+   *(Nota: O Docker cuidará de definir `DB_HOST` e `REDIS_HOST` sozinho).*
+
+3. Suba os contêineres em segundo plano:
+   ```bash
+   docker compose up -d --build
+   ```
+
+4. Acesse o aplicativo no seu navegador em `http://localhost:8000`. As migrações do banco de dados são aplicadas automaticamente na inicialização!
+
+---
+
+## 💻 Instalação Local (Sem Docker)
+
+Caso prefira rodar e configurar o ambiente manualmente em sua máquina, siga os passos abaixo:
+
+### 1. Dependências do Sistema
+
+Certifique-se de ter instalado:
 - Python 3.8 ou superior
 - MySQL Server
 - Redis Server
-- Git
-
-### Instalando MySQL e Redis (Linux Ubuntu/Debian)
 
 Caso não tenha o MySQL e o Redis instalados, você pode instalá-los e iniciar os serviços com os comandos abaixo:
 
@@ -34,29 +73,22 @@ sudo systemctl enable redis-server
 - **MySQL:** `sudo systemctl status mysql` (deve mostrar como *active/running*)
 - **Redis:** `redis-cli ping` (deve retornar `PONG`)
 
-## Instalação
+### 2. Preparando o Ambiente Python
 
-1. Clone o repositório:
-
-   ```bash
-   git clone https://github.com/seu-usuario/my-shared-list.git
-   cd my-shared-list
-   ```
-
-2. Crie um ambiente virtual (opcional, mas recomendado):
+1. Crie um ambiente virtual (opcional, mas recomendado):
 
    ```bash
    python -m venv venv
    source venv/bin/activate  # No Windows: venv\Scripts\activate
    ```
 
-3. Instale as dependências:
+2. Instale as dependências:
 
    ```bash
    pip install -r requirements.txt
    ```
 
-## Configuração
+### 3. Configuração Local
 
 1. Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
 
@@ -75,13 +107,13 @@ sudo systemctl enable redis-server
 
 2. Certifique-se de que o MySQL e Redis estão rodando.
 
-3. Crie o banco de dados no MySQL:
+3. Crie o banco de dados no MySQL (Acesse o MySQL com `mysql -u root -p`):
 
    ```sql
    CREATE DATABASE my_shared_list CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
    ```
 
-## Executando o Projeto
+### 4. Executando o Projeto
 
 1. Aplique as migrações do banco de dados:
 

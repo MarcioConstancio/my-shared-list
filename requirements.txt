@@ -8,3 +8,4 @@ mysqlclient>=2.2.0
 python-decouple>=3.8
 redis>=5.0.0
 sqlparse>=0.5.0
+daphne

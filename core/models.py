@@ -72,9 +72,6 @@ class ShoppingList(models.Model):
         
         return header + body + footer
 
-    def __str__(self):
-        return self.title
-
 class ListItem(models.Model):
     shopping_list = models.ForeignKey(ShoppingList, related_name='items', on_delete=models.CASCADE)
     name = models.CharField(max_length=200)

@@ -17,9 +17,11 @@ import random
 import redis
 from django.core.mail import send_mail
 from django.conf import settings
+from decouple import config
 
 # Configuração do cliente Redis (reaproveitando o mesmo que o channels usa)
-redis_client = redis.StrictRedis(host='127.0.0.1', port=6379, db=0, decode_responses=True)
+redis_host = config('REDIS_HOST', default='127.0.0.1')
+redis_client = redis.StrictRedis(host=redis_host, port=6379, db=0, decode_responses=True)
 
 def register_view(request):
     if request.method == 'POST':

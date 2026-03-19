@@ -19,5 +19,5 @@ RUN pip install -r requirements.txt
 # Copia o restante do projeto
 COPY . /app/
 
-# Executa a aplicação usando Daphne (suporte para WebSockets)
-CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "shopping_list_project.asgi:application"]
+# Executa as migrações e a aplicação usando Daphne na porta definida pelo ambiente (ou 8000 como fallback)
+CMD sh -c "python manage.py migrate && daphne -b 0.0.0.0 -p ${PORT:-8000} shopping_list_project.asgi:application"

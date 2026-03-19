@@ -25,6 +25,7 @@ jobs:
           # Usamos o root no CI para garantir que o Django tenha permissão de criar o banco de dados temporário de testes (test_my_shared_list)
           echo "DB_USER=root" >> .env
           echo "DB_PASSWORD=secret_root" >> .env
+          echo "EMAIL_HOST_USER=teste@dominio.com" >> .env
 
       - name: Subir banco de dados e cache
         run: docker compose up -d db redis

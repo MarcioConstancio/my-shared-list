@@ -26,13 +26,13 @@ jobs:
           echo "DB_USER=root" >> .env
           echo "DB_PASSWORD=secret_root" >> .env
 
-      - name: Subir os serviços com Docker Compose
-        run: docker compose up -d --build
+      - name: Subir banco de dados e cache
+        run: docker compose up -d db redis
 
       - name: Aguardar inicialização do banco de dados (MySQL)
         # O MySQL pode demorar alguns segundos para inicializar e aceitar conexões pela primeira vez
         run: sleep 25
 
       - name: Rodar Testes Unitários e de Integração
-        # O parâmetro -T é necessário no GitHub Actions porque a pipeline não roda em um terminal interativo (TTY)
-        run: docker compose exec -T web python manage.py test
+        # O comando 'run' inicia um container novo apenas para esta execução, contornando a necessidade de ter o Daphne rodando.
+        run: docker compose run --rm web python manage.py test

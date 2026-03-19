@@ -34,7 +34,6 @@ class User(AbstractUser):
     
     # Faça do email o campo único e obrigatório
     email = models.EmailField(_('endereço de email'), unique=True)
-    
     telefone = models.CharField(max_length=15, blank=True, null=True)
 
     # Diga ao Django para usar o email como campo de login

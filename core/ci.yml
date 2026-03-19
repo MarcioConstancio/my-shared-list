@@ -1,0 +1,38 @@
+name: CI - Build e Testes
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Criar arquivo .env de teste
+        run: |
+          echo "SECRET_KEY=chave-secreta-ci-12345" > .env
+          echo "DEBUG=True" >> .env
+          echo "ALLOWED_HOSTS=*" >> .env
+          echo "DB_NAME=my_shared_list" >> .env
+          # Usamos o root no CI para garantir que o Django tenha permissão de criar o banco de dados temporário de testes (test_my_shared_list)
+          echo "DB_USER=root" >> .env
+          echo "DB_PASSWORD=secret_root" >> .env
+
+      - name: Subir os serviços com Docker Compose
+        run: docker compose up -d --build
+
+      - name: Aguardar inicialização do banco de dados (MySQL)
+        # O MySQL pode demorar alguns segundos para inicializar e aceitar conexões pela primeira vez
+        run: sleep 25
+
+      - name: Rodar Testes Unitários e de Integração
+        # O parâmetro -T é necessário no GitHub Actions porque a pipeline não roda em um terminal interativo (TTY)
+        run: docker compose exec -T web python manage.py test
